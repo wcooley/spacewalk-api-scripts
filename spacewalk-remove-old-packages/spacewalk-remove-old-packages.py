@@ -91,9 +91,8 @@ def parse_args():
 
 def cmp_dictarray(pkgs, id):
     for pkg in pkgs:
-        for (key,val) in pkg.iteritems():
-            if val == id:
-                return True
+        if pkg['id'] == id:
+            return True
     return False
 
 def msg(msg):
