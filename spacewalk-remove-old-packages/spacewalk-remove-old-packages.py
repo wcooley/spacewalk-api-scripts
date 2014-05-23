@@ -143,8 +143,14 @@ def main():
         to_delete = spacewalk.channel.software.listPackagesWithoutChannel(spacekey)
 
     if options.lucene is not None:
-        print "Getting all packages which match %s" % options.lucene
-        to_delete = spacewalk.packages.search.advanced(spacekey, options.lucene)
+        print "Getting all packages which match '%s'" % options.lucene,
+        if options.channel:
+            print "in channel '%s'" % options.channel
+            to_delete = spacewalk.packages.search.advancedWithChannel(spacekey, options.lucene, options.channel)
+            to_delete_ids = [m['id'] for m in to_delete]
+        else:
+            print # newline
+            to_delete = spacewalk.packages.search.advanced(spacekey, options.lucene)
 
     if options.max:
         if len(to_delete) > options.max:
