@@ -162,12 +162,14 @@ def main():
     print "Packages to remove: %s" % len(to_delete)
 
     if len(to_delete) > 0:
-        if options.dryrun is None:
-            if options.channel and not options.wo_channel:
-                print "Removing %d packages from channel %s" % (len(to_delete_ids), options.channel)
+        if options.channel and not options.wo_channel:
+            if options.dryrun:
+                print "Dryrun: ",
+            print "Removing %d packages from channel %s" % (len(to_delete_ids), options.channel)
+
+            if not options.dryrun:
                 ret = spacewalk.channel.software.removePackages(spacekey, options.channel, to_delete_ids)
-        elif options.channel and not options.wo_channel:
-            print "Dryrun: Removing %d packages from channel %s" % (len(to_delete_ids), options.channel)
+
         print "Deleting packages from spacewalk (if packages could not be removed they are maybe in another channel too)"  
         for pkg in to_delete:
             if options.dryrun is not None:
