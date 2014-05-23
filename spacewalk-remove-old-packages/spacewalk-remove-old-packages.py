@@ -137,13 +137,13 @@ def main():
     spacekey = spacewalk.auth.login(options.spw_user, options.spw_pass)
    
     to_delete=[]
-    to_delete_ids=[]
+
     # get all packages
     if options.channel:
         if options.lucene:
             print "Getting all packages which match '%s' in channel '%s'" % (options.lucene, options.channel)
             to_delete = spacewalk.packages.search.advancedWithChannel(spacekey, options.lucene, options.channel)
-            to_delete_ids = [m['id'] for m in to_delete]
+
         else:
             print "Getting all packages"
             allpkgs = spacewalk.channel.software.listAllPackages(spacekey, options.channel)
@@ -156,7 +156,6 @@ def main():
                 if not cmp_dictarray(newpkgs, pkg['id']):
                     print "Marked:  %s-%s-%s (id %s)" % (pkg['name'], pkg['version'], pkg['release'], pkg['id'])
                     to_delete.append(pkg)
-                    to_delete_ids.append(pkg['id'])
             print "Removing packages from channel..."
     else:
         if options.wo_channel:
@@ -167,12 +166,10 @@ def main():
             print "Getting all packages which match '%s'" % options.lucene
             to_delete = spacewalk.packages.search.advanced(spacekey, options.lucene)
 
-    if options.max:
-        if len(to_delete) > options.max:
+    if options.max and len(to_delete) > options.max:
             to_delete = to_delete[:options.max]
-        if len(to_delete_ids) > options.max:
-            to_delete_ids = to_delete_ids[:options.max]
 
+    to_delete_ids = [m['id'] for m in to_delete]
 
     print "Packages to remove: %s" % len(to_delete)
 
