@@ -139,33 +139,32 @@ def main():
     to_delete=[]
     to_delete_ids=[]
     # get all packages
-    if options.wo_channel is None and options.lucene is None: 
-        print "Getting all packages"
-        allpkgs = spacewalk.channel.software.listAllPackages(spacekey, options.channel)
-        print " - Amount: %d" % len(allpkgs)
-        # get newest packages
-        print "Getting newest packages"
-        newpkgs = spacewalk.channel.software.listLatestPackages(spacekey, options.channel)
-        print " - Amount: %d" % len(newpkgs)
-        for pkg in allpkgs:
-            if not cmp_dictarray(newpkgs, pkg['id']):
-                print "Marked:  %s-%s-%s (id %s)" % (pkg['name'], pkg['version'], pkg['release'], pkg['id'])
-                to_delete.append(pkg)
-                to_delete_ids.append(pkg['id'])
-        print "Removing packages from channel..."
-
-    if options.wo_channel is not None:
-        print "Getting all packages without channel"
-        to_delete = spacewalk.channel.software.listPackagesWithoutChannel(spacekey)
-
-    if options.lucene is not None:
-        print "Getting all packages which match '%s'" % options.lucene,
-        if options.channel:
-            print "in channel '%s'" % options.channel
+    if options.channel:
+        if options.lucene:
+            print "Getting all packages which match '%s' in channel '%s'" % (options.lucene, options.channel)
             to_delete = spacewalk.packages.search.advancedWithChannel(spacekey, options.lucene, options.channel)
             to_delete_ids = [m['id'] for m in to_delete]
         else:
-            print # newline
+            print "Getting all packages"
+            allpkgs = spacewalk.channel.software.listAllPackages(spacekey, options.channel)
+            print " - Amount: %d" % len(allpkgs)
+            # get newest packages
+            print "Getting newest packages"
+            newpkgs = spacewalk.channel.software.listLatestPackages(spacekey, options.channel)
+            print " - Amount: %d" % len(newpkgs)
+            for pkg in allpkgs:
+                if not cmp_dictarray(newpkgs, pkg['id']):
+                    print "Marked:  %s-%s-%s (id %s)" % (pkg['name'], pkg['version'], pkg['release'], pkg['id'])
+                    to_delete.append(pkg)
+                    to_delete_ids.append(pkg['id'])
+            print "Removing packages from channel..."
+    else:
+        if options.wo_channel:
+            print "Getting all packages without channel"
+            to_delete = spacewalk.channel.software.listPackagesWithoutChannel(spacekey)
+
+        if options.lucene:
+            print "Getting all packages which match '%s'" % options.lucene
             to_delete = spacewalk.packages.search.advanced(spacekey, options.lucene)
 
     if options.max:
