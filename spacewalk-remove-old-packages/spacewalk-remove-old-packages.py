@@ -120,6 +120,11 @@ def main():
     if options.dryrun:
         msg = dryrun_msg
 
+    # Ignore a channel option if "wo_channel" is present. It might be better to
+    # check for them both and raise an error instead.
+    if options.wo_channel:
+        options.channel = None
+
     if options.channel is None and options.wo_channel is None and options.lucene is None:
         print "Channel not given, aborting"
         sys.exit(2)
