@@ -125,6 +125,10 @@ def main():
     if options.wo_channel:
         options.channel = None
 
+        if options.lucene:
+            print "Option '--without-channels' conflicts with '--with-lucene-search'!"
+            sys.exit(2)
+
     if options.channel is None and options.wo_channel is None and options.lucene is None:
         print "Channel not given, aborting"
         sys.exit(2)
