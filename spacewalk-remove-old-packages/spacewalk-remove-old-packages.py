@@ -96,7 +96,11 @@ def cmp_dictarray(pkgs, id):
                 return True
     return False
 
+def msg(msg):
+    print msg
 
+def dryrun_msg(msg):
+    print "Dryrun:", msg
 
 def main():
 
@@ -112,6 +116,9 @@ def main():
             options.spw_user = config.get ('Spacewalk', 'spw_user')
         if options.spw_pass is None:
             options.spw_pass = config.get ('Spacewalk', 'spw_pass')
+
+    if options.dryrun:
+        msg = dryrun_msg
 
     if options.channel is None and options.wo_channel is None and options.lucene is None:
         print "Channel not given, aborting"
@@ -163,19 +170,17 @@ def main():
 
     if len(to_delete) > 0:
         if options.channel and not options.wo_channel:
-            if options.dryrun:
-                print "Dryrun: ",
-            print "Removing %d packages from channel %s" % (len(to_delete_ids), options.channel)
+            msg("Removing %d packages from channel %s" % (len(to_delete_ids), options.channel))
 
             if not options.dryrun:
                 ret = spacewalk.channel.software.removePackages(spacekey, options.channel, to_delete_ids)
 
         print "Deleting packages from spacewalk (if packages could not be removed they are maybe in another channel too)"  
+
         for pkg in to_delete:
-            if options.dryrun is not None:
-                print "Dryrun: - Delete package %s-%s-%s (ID: %s)" % (pkg['name'], pkg['version'], pkg['release'], pkg['id'])
-            else:
-                print "Deleting package %s-%s-%s (ID: %s)" % (pkg['name'], pkg['version'], pkg['release'],pkg['id'])
+            msg("Deleting package %s-%s-%s (ID: %s)" % (pkg['name'], pkg['version'], pkg['release'],pkg['id']))
+
+            if not options.dryrun:
                 try: 
                     ret = spacewalk.packages.removePackage(spacekey, pkg['id'])
                 except: 
