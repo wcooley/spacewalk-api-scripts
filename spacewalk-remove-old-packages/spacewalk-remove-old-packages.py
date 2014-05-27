@@ -146,11 +146,11 @@ def main():
             newpkgs = set([m['id'] for m in newpkgs])
 
             print " - Amount: %d" % len(newpkgs)
-            for pkg in allpkgs:
-                if not pkg['id'] in newpkgs:
-                    print "Marked:  %s-%s-%s (id %s)" % (pkg['name'], pkg['version'], pkg['release'], pkg['id'])
-                    to_delete.append(pkg)
-            print "Removing packages from channel..."
+            to_delete = filter(lambda m: m['id'] not in newpkgs, allpkgs)
+
+            # TODO: if options.verbose:
+            for pkg in to_delete:
+                print "Marked:  %s-%s-%s (id %s)" % (pkg['name'], pkg['version'], pkg['release'], pkg['id'])
     else:
         if options.wo_channel:
             print "Getting all packages without channel"
